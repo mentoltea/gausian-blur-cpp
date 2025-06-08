@@ -1,0 +1,6 @@
+[submodule "stbimg"]
+	path = stbimg
+	url = https://github.com/mentoltea/stbimg.git
+[submodule "matrix"]
+	path = matrix
+	url = https://github.com/mentoltea/CppMatrix.git
