@@ -30,33 +30,30 @@ Image gauss_blur(
 }
 
 Image algorythm(const Image& original) {
-    Image preprocess = gauss_blur(original, 13, 1);
+    // Image preprocess = gauss_blur(original, 13, 1);
 
-    Image bw = to_grayscale(preprocess);
-    ColorRGBA missing_color(0.25,0.25,0.25);
+    Image bw = to_grayscale(original);
+    ColorRGBA missing_color(1,1,1);
     
-    int conv_size = 7;
-    int conv_size_diff = 5;
+    int conv_size = 9;
+    int conv_size_diff = 1;
 
-    double StBase = 1;
-    double StDiff = 0.95;
+    double StBase = 0.75;
+    double StDiff = 0.1;
 
     Image g1 = gauss_blur(bw, conv_size, StBase, missing_color);
     Image g2 = gauss_blur(bw, conv_size+conv_size_diff, StBase+StDiff, missing_color);
     
-    Image modified = g2 - g1;
+    Image modified = (g2 - g1)/2 + (g1 - g2)/2;
 
     ColorRGBA max_clr;
     double k;
     
     max_clr = get_color_at_int(modified, max(modified, to_gray));
     k = to_gray(max_clr);
-    // modified = threashhold(modified, to_gray, k*(0.05));
-    modified = (modified/k) * 2;
+    modified = (modified/k);
 
-    // modified = original * (modified);
-
-    // modified = (original/3 + modified/2);
+    modified = modified * 5;
 
     return modified;
 }
