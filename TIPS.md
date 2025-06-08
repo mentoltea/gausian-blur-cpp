@@ -2,7 +2,8 @@
 (in pseudocode)
 
 - ## Increase contrast:
-`image * gaus_blur(grayscale(image))`
+`image * gaus_blur(grayscale(image))`  
+
 ![constrast](examples/constrast.jpg)
 
 - ## Detect edge (DoG method):
@@ -12,7 +13,8 @@ g2 = gaus_blur(image, size+sizediff, stdev + stdiff)
 mod = (g2 - g1).normalize
 return mod
 ```
-![edges](examples/edge_output.jpg)
+![edges](examples/edge_output.jpg)  
+
 The artifacts in the corner are caused by артивишал блят edge created by replacing non-existing pixels (pixels out of image) with solid color.
 May consider using different method of out-of-image pixels interpolation.
 
