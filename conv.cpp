@@ -5,7 +5,7 @@
 
 Convolution::Convolution(int size): matrix(size, size) {}
 
-Image Convolution::operator()(const Image& input) {
+Image Convolution::operator()(const Image& input, ColorRGBA missing_color) {
     Image modified(input.width, input.height, input.channels);
 
     for (int y=0; y<input.height; y++) {
@@ -21,7 +21,7 @@ Image Convolution::operator()(const Image& input) {
                     if (cur_x<0 || cur_x>=input.width
                         || cur_y<0 || cur_y>=input.height) 
                     {
-                        cur_clr = ColorRGBA(0.5,0.5,0.5); // if point is out of image
+                        cur_clr = missing_color; // if point is out of image
                     } else {
                         cur_clr = get_color_at_int(input, {cur_x, cur_y});
                     }

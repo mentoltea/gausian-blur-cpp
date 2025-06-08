@@ -8,6 +8,7 @@
 // #include <cmath>
 #include <fstream>
 #include <cstdint>
+#include <functional>
 
 #include "stbimg/image.hpp"
 
@@ -72,8 +73,28 @@ void set_color_at_int(Image &img, std::pair<int,int> ixy, ColorRGBA clr);
 
 void set_color_at_uv(Image &img, Point2 uv, ColorRGBA clr);
 
+double to_gray(ColorRGBA clr);
 
 Image to_grayscale(const Image& img);
 
+Image operator+(const Image& i1, const Image& i2);
+Image operator-(const Image& i1, const Image& i2);
+
+Image operator*(const Image& image, double k);
+Image operator*(double k, const Image& image);
+Image operator/(const Image& image, double k);
+
+
+Image operator*(const Image& image, const Image& gray);
+
+std::pair<int,int> min(const Image& image, const std::function<double(ColorRGBA)> &func);
+std::pair<int,int> max(const Image& image, const std::function<double(ColorRGBA)> &func);
+
+Image threashhold(
+    const Image& image, 
+    const std::function<double(ColorRGBA)> &func,
+    double minvalue, 
+    ColorRGBA alter_color = ColorRGBA(0,0,0)
+);
 
 #endif // BASIC_H

@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 
     if (argc >= 3) {
         output_file = argv[2];
-        size_t pos = output_file.find('.');
+        size_t pos = output_file.size() - 1 - std::string(output_file.rbegin(), output_file.rend()).find('.');
         std::string format = output_file.substr(pos+1);
         
         if (format == "jpg") save_format = JPG;

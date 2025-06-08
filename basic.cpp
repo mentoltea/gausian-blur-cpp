@@ -181,6 +181,9 @@ void set_color_at_uv(Image &img, Point2 uv, ColorRGBA color) {
     set_color_at_int(img, ixy, color);
 }
 
+double to_gray(ColorRGBA clr) {
+    return (clr.r + clr.g + clr.b)/3.0;
+}
 
 Image to_grayscale(const Image& img) {
     if (img.channels==1) {
@@ -211,5 +214,144 @@ Image to_grayscale(const Image& img) {
         }
     }
 
+    return output;
+}
+
+Image operator+(const Image& i1, const Image& i2) {
+    if (i1.width != i2.width || i1.height != i2.height || i1.channels != i2.channels) {
+        throw std::runtime_error("Can add/subtract only images with same properties");
+    }
+    Image output(i1.width, i1.height, i1.channels);
+    for (int x=0; x<i1.width; x++) {
+        for (int y=0; y<i1.height; y++) {
+            ColorRGBA c1 = get_color_at_int(i1, {x,y});
+            ColorRGBA c2 = get_color_at_int(i2, {x,y});
+            ColorRGBA color = c1 + c2;
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
+    return output;
+}
+
+Image operator-(const Image& i1, const Image& i2) {
+    if (i1.width != i2.width || i1.height != i2.height || i1.channels != i2.channels) {
+        throw std::runtime_error("Can add/subtract only images with same properties");
+    }
+    Image output(i1.width, i1.height, i1.channels);
+    for (int x=0; x<output.width; x++) {
+        for (int y=0; y<output.height; y++) {
+            ColorRGBA c1 = get_color_at_int(i1, {x,y});
+            ColorRGBA c2 = get_color_at_int(i2, {x,y});
+            ColorRGBA color = c1 - c2;
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
+    return output;
+}
+
+Image operator*(const Image& image, double k) {
+    Image output(image.width, image.height, image.channels);
+    for (int x=0; x<output.width; x++) {
+        for (int y=0; y<output.height; y++) {
+            ColorRGBA c1 = get_color_at_int(image, {x,y});
+            ColorRGBA color = c1 * k;
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
+    return output;
+}
+
+Image operator*(double k, const Image& image) {
+    return image*k;
+}
+
+Image operator/(const Image& image, double k) {
+    Image output(image.width, image.height, image.channels);
+    for (int x=0; x<output.width; x++) {
+        for (int y=0; y<output.height; y++) {
+            ColorRGBA c1 = get_color_at_int(image, {x,y});
+            ColorRGBA color = c1 / k;
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
+    return output;
+}
+
+Image operator*(const Image& image, const Image& gray) {
+    if (image.width != gray.width || image.height != gray.height) {
+        throw std::runtime_error("Can multiply only images with same properties");
+    }
+    if (gray.channels != 1) {
+        throw std::runtime_error("Second image must be grayscale for multiplication");
+    }
+
+    Image output(image.width, image.height, image.channels);
+    for (int x=0; x<output.width; x++) {
+        for (int y=0; y<output.height; y++) {
+            ColorRGBA c1 = get_color_at_int(image, {x,y});
+            ColorRGBA c2 = get_color_at_int(gray, {x,y});
+            double val = c2.r;
+            ColorRGBA color = c1 * val;
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
+    return output;
+}
+
+std::pair<int,int> min(const Image& image, const std::function<double(ColorRGBA)> &func) {
+    int target_x;
+    int target_y;
+    double target_param = INFINITY;
+    for (int x=0; x<image.width; x++) {
+        for (int y=0; y<image.height; y++) {
+            ColorRGBA clr = get_color_at_int(image, {x,y});
+            double param = func(clr);
+            if (param < target_param) {
+                target_param = param;
+                target_x = x;
+                target_y = y;
+            }
+        }
+    }
+    return {target_x,target_y};
+}
+
+std::pair<int,int> max(const Image& image, const std::function<double(ColorRGBA)> &func) {
+    int target_x;
+    int target_y;
+    double target_param = -INFINITY;
+    for (int x=0; x<image.width; x++) {
+        for (int y=0; y<image.height; y++) {
+            ColorRGBA clr = get_color_at_int(image, {x,y});
+            double param = func(clr);
+            if (param > target_param) {
+                target_param = param;
+                target_x = x;
+                target_y = y;
+            }
+        }
+    }
+    return {target_x,target_y};
+}
+
+
+Image threashhold(
+    const Image& image, 
+    const std::function<double(ColorRGBA)> &func,
+    double minvalue, 
+    ColorRGBA alter_color
+) {
+    Image output(image.width, image.height, image.channels);
+    for (int x=0; x<output.width; x++) {
+        for (int y=0; y<output.height; y++) {
+            ColorRGBA c = get_color_at_int(image, {x,y});
+            ColorRGBA color;
+
+            if (func(c) >= minvalue) color = c;
+            else color = alter_color;
+            
+            set_color_at_int(output, {x,y}, color);
+        }
+    }
     return output;
 }

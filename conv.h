@@ -9,7 +9,7 @@ class Convolution {
     
     Convolution(int size);
     
-    Image operator()(const Image& input);
+    Image operator()(const Image& input, ColorRGBA missing_color = ColorRGBA(0,0,0));
 };
 
 
